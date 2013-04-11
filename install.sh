@@ -7,8 +7,8 @@
 #
 
 # NOTES:
-#	1.	IMPORTANT: You must create a .production file in the root of your Meteor
-#		app. An example .production file looks like this:
+#	1.	IMPORTANT: You must create a .#production file in the root of your Meteor
+#		app. An example .#production file looks like this:
 #
 # 		export MONGO_URL='mongodb://user:pass@linus.mongohq.com:10090/dbname'
 # 		export ROOT_URL='http://www.mymeteorapp.com'
@@ -35,8 +35,8 @@ SERVICENAME=meteor_app
 # Internal variables
 ################################################################################
 
-MAINUSER=`whoami`
-MAINGROUP=`id -g -n $MAINUSER`
+MAINUSER=$(whoami)
+MAINGROUP=$(id -g -n $MAINUSER)
 
 GITBAREREPO=/home/$MAINUSER/$SERVICENAME.git
 EXPORTFOLDER=/tmp/$SERVICENAME
@@ -230,7 +230,7 @@ function setup_post_update_hook {
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "echo \"Updating production executable\""
 	append $HOOK "echo \"------------------------------------------------------------------------\""
-	append $HOOK "sudo mv -f $EXPORTFOLDER/.production $APPEXECUTABLE"
+	append $HOOK "sudo mv -f $EXPORTFOLDER/.#production $APPEXECUTABLE"
 	append $HOOK "echo -e \"\\\n\\\n/usr/bin/node $APPFOLDER/main.js >> \\\$1 2>&1\" >> $APPEXECUTABLE"
 	append $HOOK "chmod 700 $APPEXECUTABLE"
 
@@ -284,7 +284,7 @@ function show_conclusion {
 	echo "$ git remote add ec2 $MAINUSER@$APPHOST:$SERVICENAME.git"
 	echo ""
 	echo "Add to your ~/.ssh/config:"
-	echo "Host $APPHOST\n  Hostname $APPHOST\n  IdentityFile PRIVATE_KEY_YOU_GOT_FROM_AWS.pem"
+	echo -e "Host $APPHOST\n  Hostname $APPHOST\n  IdentityFile PRIVATE_KEY_YOU_GOT_FROM_AWS.pem"
 	echo ""
 	echo "To deploy:"
 	echo "$ git push ec2 master"
