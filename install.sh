@@ -152,6 +152,15 @@ function install_meteor {
 	curl https://install.meteor.com | /bin/sh
 }
 
+function install_phantomjs {
+	echo "--------------------------------------------------------------------------------"
+	echo "Install PhantomJS"
+	echo "--------------------------------------------------------------------------------"
+
+	sudo apt-get -y install fontconfig
+	sudo npm install phantomjs -g
+}
+
 function setup_app_skeleton {
 	echo "--------------------------------------------------------------------------------"
 	echo "Setup app skeleton"
@@ -311,6 +320,7 @@ install_git
 install_nodejs
 install_mongodb
 install_meteor
+install_phantomjs
 setup_app_skeleton
 setup_app_service
 setup_bare_repo
