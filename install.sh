@@ -198,6 +198,7 @@ function setup_app_service {
 	append $SERVICEFILE "end script"
 
 	append $SERVICEFILE "script"
+	append $SERVICEFILE "  sleep 5"
 	append $SERVICEFILE "  echo \$\$ > /var/run/$SERVICENAME.pid"
 	append $SERVICEFILE "  $APPEXECUTABLE \"$LOGFILE\""
 	append $SERVICEFILE "end script"
