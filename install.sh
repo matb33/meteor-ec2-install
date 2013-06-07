@@ -233,7 +233,7 @@ function setup_post_update_hook {
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "echo \"Exporting app from git repo\""
 	append $HOOK "echo \"------------------------------------------------------------------------\""
-	append $HOOK "rm -rf $EXPORTFOLDER"
+	append $HOOK "sudo rm -rf $EXPORTFOLDER"
 	append $HOOK "mkdir -p $EXPORTFOLDER"
 	append $HOOK "git archive master | tar -x -C $EXPORTFOLDER"
 
@@ -249,7 +249,7 @@ function setup_post_update_hook {
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "cd $EXPORTFOLDER"
 	append $HOOK "meteor update"
-	append $HOOK "meteor bundle $EXPORTFOLDER/bundle.tar.gz"
+	append $HOOK "sudo meteor bundle $EXPORTFOLDER/bundle.tar.gz"
 	append $HOOK "if [ -f $EXPORTFOLDER/bundle.tar.gz ]; then"
 	append $HOOK "  mkdir -p $RSYNCSOURCE"
 	append $HOOK "  tar -zxf $EXPORTFOLDER/bundle.tar.gz --strip-components 1 -C $RSYNCSOURCE"
@@ -260,7 +260,7 @@ function setup_post_update_hook {
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    cd $RSYNCSOURCE/server/node_modules"
 	append $HOOK "    rm -rf fibers"
-	append $HOOK "    npm install fibers@1.0.0"
+	append $HOOK "    sudo npm install fibers@1.0.0"
 
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    echo \"Rsync standalone app to active app location\""
@@ -275,7 +275,7 @@ function setup_post_update_hook {
 
 	# Clean-up
 	append $HOOK "  cd $APPFOLDER"
-	append $HOOK "  rm -rf $EXPORTFOLDER"
+	append $HOOK "  sudo rm -rf $EXPORTFOLDER"
 	append $HOOK "fi"
 
 	append $HOOK "echo \"\n\n--- Done.\""
