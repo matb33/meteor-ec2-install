@@ -21,7 +21,7 @@
 #	3.	The SERVICENAME variable below can remain the same, but if you prefer
 #		you can name it after your app (example: SERVICENAME=foobar).
 #
-#	4.	Logs for you app can be found under /var/log/[SERVICENAME].log
+#	4.	Logs for your app can be found under /var/log/[SERVICENAME].log
 #
 
 ################################################################################
