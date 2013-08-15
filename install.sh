@@ -260,7 +260,7 @@ function setup_post_update_hook {
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    cd $RSYNCSOURCE/server/node_modules"
 	append $HOOK "    rm -rf fibers"
-	append $HOOK "    sudo npm install fibers@1.0.0"
+	append $HOOK "    sudo npm install fibers@1.0.1"
 
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    echo \"Rsync standalone app to active app location\""
