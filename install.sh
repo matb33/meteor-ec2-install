@@ -105,6 +105,11 @@ function configure_automatic_security_updates {
 	echo "--------------------------------------------------------------------------------"
 
 	# Reference: http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers
+
+	# Note that you will still need to do your own restarts. Uncomment this line if you
+	# would like to have your server restarted automatically at 11:59pm on Sundays:
+	#append "/etc/crontab" "59 23\t* * 7\troot\t/sbin/shutdown -r now >> /dev/null 2>&1"
+
 	sudo apt-get -y install unattended-upgrades
 
 	replace "/etc/apt/apt.conf.d/10periodic" \
