@@ -263,7 +263,7 @@ function setup_post_update_hook {
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    echo \"Building Fibers\""
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
-	append $HOOK "    cd $RSYNCSOURCE/server/node_modules"
+	append $HOOK "    cd $RSYNCSOURCE/programs/server/node_modules"
 	append $HOOK "    rm -rf fibers"
 	append $HOOK "    sudo npm install fibers@1.0.1"
 
