@@ -31,7 +31,7 @@ names of course).
 ```shell
 #!/bin/bash
 
-export MONGO_URL="mongodb://user:pass@linus.mongohq.com:10090/dbname"
+export MONGO_URL="mongodb://127.0.0.1:27017/meteor"
 export ROOT_URL="http://www.mymeteorapp.com"
 export NODE_ENV="production"
 export PORT="80"
@@ -64,11 +64,6 @@ near the `git archive` of `setup_post_update_hook`).*
 ## Notes:
 
 1.	Logs for your app can be found under `/var/log/[SERVICENAME].log`
-
-2.	Although MongoDB is installed, I've only tested against having my database
-	remotely on MongoHQ. Let me know if you have issues with a local DB, or send
-	me a pull request with the necessary adjustments to fully support local
-	databases.
 
 ## Running locally
 
