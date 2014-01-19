@@ -65,7 +65,7 @@ near the `git archive` of `setup_post_update_hook`).*
 
 1.	Logs for your app can be found under `/var/log/[SERVICENAME].log`
 
-## Running locally
+## Running locally:
 
 To load your `settings.json` when developing locally, create a file in the root
 of your project called `meteor` (and make it executable, such as
