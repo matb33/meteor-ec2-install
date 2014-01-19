@@ -19,7 +19,6 @@ EXPORTFOLDER=/tmp/$SERVICENAME
 
 APPFOLDER=/home/$MAINUSER/$SERVICENAME
 APPBINFOLDER=$APPFOLDER/bin
-APPEXECUTABLE=$APPFOLDER/start.sh
 APPENV=$APPFOLDER/env.sh
 APPCONFIGBASE=$APPFOLDER/config
 
@@ -154,11 +153,6 @@ function setup_app_skeleton {
 	rm -rf $APPFOLDER
 	mkdir -p $APPBINFOLDER
 	touch $APPBINFOLDER/main.js
-
-	echo -e "source $APPENV" > $APPEXECUTABLE
-	echo -e "/usr/bin/node $APPBINFOLDER/main.js >> \$1 2>&1" >> $APPEXECUTABLE
-
-	chmod 700 $APPEXECUTABLE
 }
 
 function setup_app_service {
@@ -190,7 +184,7 @@ function setup_app_service {
 	append $SERVICEFILE "script"
 	append $SERVICEFILE "  sleep 5"
 	append $SERVICEFILE "  echo \$\$ > /var/run/$SERVICENAME.pid"
-	append $SERVICEFILE "  $APPEXECUTABLE \"$LOGFILE\""
+	append $SERVICEFILE "  exec bash -c 'cd $APPFOLDER && source $APPENV && exec /usr/bin/node $APPBINFOLDER/main.js >> \"$LOGFILE\" 2>&1'"
 	append $SERVICEFILE "end script"
 }
 
