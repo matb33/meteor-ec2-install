@@ -1,29 +1,5 @@
 #!/bin/bash
 
-# HOW TO EXECUTE:
-#	1.	SSH into a fresh installation of Ubuntu 12.10 64-bit
-#	2.	Put this script anywhere, such as /tmp/install.sh
-#	3.	$ chmod +x /tmp/install.sh && /tmp/install.sh
-#
-
-# NOTES:
-#	1.	IMPORTANT: You must create a .#production file in the root of your Meteor
-#		app. An example .#production file looks like this:
-#
-# 		export MONGO_URL='mongodb://user:pass@linus.mongohq.com:10090/dbname'
-# 		export ROOT_URL='http://www.mymeteorapp.com'
-# 		export NODE_ENV='production'
-# 		export PORT=80
-#
-#	2.	The APPHOST variable below should be updated to the hostname or elastic
-#		IP of the EC2 instance you created.
-#
-#	3.	The SERVICENAME variable below can remain the same, but if you prefer
-#		you can name it after your app (example: SERVICENAME=foobar).
-#
-#	4.	Logs for your app can be found under /var/log/[SERVICENAME].log
-#
-
 ################################################################################
 # Variables you should adjust for your setup
 ################################################################################
@@ -40,8 +16,12 @@ MAINGROUP=$(id -g -n $MAINUSER)
 
 GITBAREREPO=/home/$MAINUSER/$SERVICENAME.git
 EXPORTFOLDER=/tmp/$SERVICENAME
+
 APPFOLDER=/home/$MAINUSER/$SERVICENAME
-APPEXECUTABLE=/home/$MAINUSER/.$SERVICENAME
+APPBINFOLDER=$APPFOLDER/bin
+APPEXECUTABLE=$APPFOLDER/start.sh
+APPENV=$APPFOLDER/env.sh
+APPCONFIGBASE=$APPFOLDER/config
 
 ################################################################################
 # Utility functions
@@ -172,8 +152,13 @@ function setup_app_skeleton {
 	echo "--------------------------------------------------------------------------------"
 
 	rm -rf $APPFOLDER
-	mkdir -p $APPFOLDER
-	touch $APPFOLDER/main.js
+	mkdir -p $APPBINFOLDER
+	touch $APPBINFOLDER/main.js
+
+	echo -e "source $APPENV" > $APPEXECUTABLE
+	echo -e "/usr/bin/node $APPBINFOLDER/main.js >> \$1 2>&1" >> $APPEXECUTABLE
+
+	chmod 700 $APPEXECUTABLE
 }
 
 function setup_app_service {
@@ -240,20 +225,23 @@ function setup_post_update_hook {
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "sudo rm -rf $EXPORTFOLDER"
 	append $HOOK "mkdir -p $EXPORTFOLDER"
-	append $HOOK "git archive master | tar -x -C $EXPORTFOLDER"
+	append $HOOK "while read oldrev newrev refname"
+	append $HOOK "do"
+	append $HOOK "  BRANCH=\$(git rev-parse --symbolic --abbrev-ref \$refname)"
+	append $HOOK "  git archive \$BRANCH | tar -x -C $EXPORTFOLDER"
+	append $HOOK "done"
 
 	append $HOOK "echo \"------------------------------------------------------------------------\""
-	append $HOOK "echo \"Updating production executable\""
+	append $HOOK "echo \"Updating environment variable files\""
 	append $HOOK "echo \"------------------------------------------------------------------------\""
-	append $HOOK "sudo mv -f $EXPORTFOLDER/.#production $APPEXECUTABLE"
-	append $HOOK "echo -e \"\\\n\\\n/usr/bin/node $APPFOLDER/main.js >> \\\$1 2>&1\" >> $APPEXECUTABLE"
-	append $HOOK "chmod 700 $APPEXECUTABLE"
+	append $HOOK "mkdir -p $APPCONFIGBASE/\$BRANCH"
+	append $HOOK "cp -f $EXPORTFOLDER/config/\$BRANCH/env.sh $APPENV"
+	append $HOOK "cp -f $EXPORTFOLDER/config/\$BRANCH/settings.json $APPCONFIGBASE/\$BRANCH/settings.json"
 
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "echo \"Bundling app as a standalone Node.js app\""
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "cd $EXPORTFOLDER"
-	append $HOOK "meteor update"
 	append $HOOK "sudo meteor bundle $EXPORTFOLDER/bundle.tar.gz"
 	append $HOOK "if [ -f $EXPORTFOLDER/bundle.tar.gz ]; then"
 	append $HOOK "  mkdir -p $RSYNCSOURCE"
@@ -270,7 +258,7 @@ function setup_post_update_hook {
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    echo \"Rsync standalone app to active app location\""
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
-	append $HOOK "    rsync --checksum --recursive --update --delete --times $RSYNCSOURCE/ $APPFOLDER/"
+	append $HOOK "    rsync --checksum --recursive --update --delete --times $RSYNCSOURCE/ $APPBINFOLDER/"
 
 	append $HOOK "    echo \"------------------------------------------------------------------------\""
 	append $HOOK "    echo \"Restart app\""
@@ -279,7 +267,7 @@ function setup_post_update_hook {
 	append $HOOK "  fi"
 
 	# Clean-up
-	append $HOOK "  cd $APPFOLDER"
+	append $HOOK "  cd $APPBINFOLDER"
 	append $HOOK "  sudo rm -rf $EXPORTFOLDER"
 	append $HOOK "fi"
 
@@ -299,7 +287,7 @@ function show_conclusion {
 	echo "$ git remote add ec2 $MAINUSER@$APPHOST:$SERVICENAME.git"
 	echo ""
 	echo "Add to your ~/.ssh/config:"
-	echo -e "Host $APPHOST\n  Hostname $APPHOST\n  IdentityFile PRIVATE_KEY_YOU_GOT_FROM_AWS.pem"
+	echo -e "Host $APPHOST\n  IdentityFile PRIVATE_KEY_YOU_GOT_FROM_AWS.pem"
 	echo ""
 	echo "To deploy:"
 	echo "$ git push ec2 master"
