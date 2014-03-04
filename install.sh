@@ -136,6 +136,14 @@ function install_meteor {
 	curl https://install.meteor.com | /bin/sh
 }
 
+function install_meteorite {
+	echo "--------------------------------------------------------------------------------"
+	echo "Install Meteorite"
+	echo "--------------------------------------------------------------------------------"
+
+	sudo -H npm install meteorite -g
+}
+
 function install_phantomjs {
 	echo "--------------------------------------------------------------------------------"
 	echo "Install PhantomJS"
@@ -223,6 +231,8 @@ function setup_post_update_hook {
 	append $HOOK "do"
 	append $HOOK "  BRANCH=\$(git rev-parse --symbolic --abbrev-ref \$refname)"
 	append $HOOK "  git archive \$BRANCH | tar -x -C $EXPORTFOLDER"
+	append $HOOK "  git clone --recursive \"\$PWD\" -b \$BRANCH $EXPORTFOLDER"
+	append $HOOK "  rm -rf $EXPORTFOLDER/.git*"
 	append $HOOK "done"
 
 	append $HOOK "echo \"------------------------------------------------------------------------\""
@@ -236,7 +246,11 @@ function setup_post_update_hook {
 	append $HOOK "echo \"Bundling app as a standalone Node.js app\""
 	append $HOOK "echo \"------------------------------------------------------------------------\""
 	append $HOOK "cd $EXPORTFOLDER"
-	append $HOOK "sudo meteor bundle $EXPORTFOLDER/bundle.tar.gz"
+	append $HOOK "if [ -f $EXPORTFOLDER/smart.json ]; then"
+	append $HOOK "  sudo mrt bundle $EXPORTFOLDER/bundle.tar.gz"
+	append $HOOK "else"
+	append $HOOK "  sudo meteor bundle $EXPORTFOLDER/bundle.tar.gz"
+	append $HOOK "fi"
 	append $HOOK "if [ -f $EXPORTFOLDER/bundle.tar.gz ]; then"
 	append $HOOK "  mkdir -p $RSYNCSOURCE"
 	append $HOOK "  tar -zxf $EXPORTFOLDER/bundle.tar.gz --strip-components 1 -C $RSYNCSOURCE"
@@ -308,6 +322,7 @@ install_git
 install_nodejs
 install_mongodb
 install_meteor
+install_meteorite
 install_phantomjs
 setup_app_skeleton
 setup_app_service
