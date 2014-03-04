@@ -1,4 +1,4 @@
-# Meteor EC2 installation script (1.0.1)
+# Meteor EC2 installation script (1.1.0)
 
 Automated server installation for Meteor 0.6.0+ on a fresh AWS EC2 Ubuntu Server
 12.10+ installation.
