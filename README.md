@@ -56,10 +56,8 @@ See [docs.meteor.com](http://docs.meteor.com/#meteor_settings) for more
 information on `settings.json`.
 
 *NOTE: You could potentially store the `config` folder as a separate git
-repository and pull it in as a submodule. If you take this approach,
-you will need to know your way around git and make some minor
-modifications to this script so that it knows to pull in submodules (start
-near the `git archive` of `setup_post_update_hook`).*
+repository and pull it in as a submodule. This script supports submodules but
+does require the server to have SSH access to the submodule repositories.*
 
 ## Notes:
 
@@ -79,3 +77,33 @@ Contents of your project's `meteor` file:
 #!/bin/bash
 meteor --settings "config/$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')/settings.json"
 ```
+
+## Submodules
+
+If using submodules, it's important for your server to have repository access to
+each submodule. A potential approach is as follows:
+
+1. 	Generate a keypair while on your server, specifically used for pulling
+	submodules:
+
+	```shell
+	cd ~/.ssh
+	ssh-keygen -t rsa -C "yourmeteorserver@yourdomain.com"
+	```
+
+	In this case I would not bother with a passphrase.
+
+2.	Use the newly generated public key to grant access to each of the
+	submodules. This usually involves copying the public key and adding it in
+	the access settings within the repository host's control panel. If possible,
+	read-only privileges would certainly not hurt.
+
+3.	Configure the server's SSH config file to use the newly generated private
+	key to access the remote submodule repository:
+
+	```shell
+	Host submodulerepohost.com
+		User submodulerepouser
+		StrictHostKeyChecking no
+		IdentityFile ~/.ssh/thatprivatekeyyoumade
+	```
