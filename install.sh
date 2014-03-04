@@ -230,7 +230,6 @@ function setup_post_update_hook {
 	append $HOOK "while read oldrev newrev refname"
 	append $HOOK "do"
 	append $HOOK "  BRANCH=\$(git rev-parse --symbolic --abbrev-ref \$refname)"
-	append $HOOK "  git archive \$BRANCH | tar -x -C $EXPORTFOLDER"
 	append $HOOK "  git clone --recursive \"\$PWD\" -b \$BRANCH $EXPORTFOLDER"
 	append $HOOK "  rm -rf $EXPORTFOLDER/.git*"
 	append $HOOK "done"
